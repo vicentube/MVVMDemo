@@ -1,12 +1,12 @@
-// CoreDataService.swift
+// CoreDataStorage.swift
 // MVVMDemo
 //
-// Creado el 21/7/21 por Vicente Úbeda (@vicentube)
+// Creado el 22/7/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 import CoreData
 
-protocol DatabaseServiceProtocol {
+protocol StorageProtocol {
   
   func fetchAllTasks(completion: @escaping ([TaskProtocol]) -> Void)
   func fetchTaskById(_ id: UUID, completion: @escaping (TaskProtocol) -> Void)
@@ -14,7 +14,7 @@ protocol DatabaseServiceProtocol {
   func saveTask(_ task: TaskProtocol, completion: @escaping (Bool) -> Void)
 }
 
-final class CoreDataService: DatabaseServiceProtocol {
+final class CoreDataStorage: StorageProtocol {
   
   private static let container = { () -> NSPersistentContainer in
     let container = NSPersistentContainer(name: "MVVMDemo")
@@ -134,7 +134,7 @@ final class CoreDataService: DatabaseServiceProtocol {
   }
 }
 
-final class PreviewDatabaseService: DatabaseServiceProtocol {
+final class PreviewStorage: StorageProtocol {
   
   func fetchAllTasks(completion: @escaping ([TaskProtocol]) -> Void) {
     let tasks = [

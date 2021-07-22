@@ -8,38 +8,41 @@ import SwiftUI
 
 struct TaskListView: View {
   
-  @ObservedObject var vm: TaskListViewModel
+  @EnvironmentObject private var store: TaskStore
+  
+  @State private var showingNewTask = false
+  
+  var tasks: [Task] { store.tasks }
   
   var body: some View {
-    NavigationView {
-      List {
-        ForEach(vm.tasks) { task in
-          NavigationLink(destination: TaskDetailView(vm: vm.taskDetailVM(task))) {
-            Text(task.title)
-          }
+    List {
+      ForEach(tasks) { task in
+        NavigationLink(destination: TaskDetailView(task: task)) {
+          Text(task.title)
         }
       }
-      .navigationBarTitle("Tasks")
-      .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
-          Button(action: vm.showNewTask) {
-            Image(systemName: "plus")
-          }
-        }
-      }
-      .sheet(isPresented: $vm.showingNewTask, onDismiss: vm.getAllTasks) {
-        TaskEditView(vm: vm.newTaskVM())
-      }
-      .onAppear(perform: vm.getAllTasks)
     }
+    .navigationBarTitle("Tasks")
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button(action: { showingNewTask = true }) {
+          Image(systemName: "plus")
+        }
+      }
+    }
+    .sheet(isPresented: $showingNewTask) {
+      TaskEditView(task: nil)
+    }
+    .onAppear(perform: store.getAllTasks)
   }
 }
 
 struct TaskListView_Previews: PreviewProvider {
-  static let dbPreview = PreviewDatabaseService()
+  static let store = TaskStore.preview
   
   static var previews: some View {
-    let vm = TaskListViewModel(dbService: dbPreview)
-    TaskListView(vm: vm)
+    NavigationView {
+      TaskListView()
+    }
   }
 }

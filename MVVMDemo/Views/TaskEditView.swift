@@ -8,17 +8,25 @@ import SwiftUI
 
 struct TaskEditView: View {
   
+  let task: Task?
+  
   @Environment(\.presentationMode) var presentation
-  @ObservedObject var vm: TaskEditViewModel
+  @EnvironmentObject private var store: TaskStore
+  
+  @State private var draft = Task()
+  
+  var viewTitle: String {
+    task == nil ? "New task" : "Edit task"
+  }
   
   var body: some View {
     VStack {
       HStack {
-        Button(action: vm.cancel) {
+        Button(action: cancel) {
           Text("Cancel")
         }
         Spacer()
-        Button(action: vm.save) {
+        Button(action: done) {
           Text("Done")
         }
       }
@@ -26,27 +34,31 @@ struct TaskEditView: View {
       Text(viewTitle)
         .font(.title)
         .padding()
-      TextField("Enter title", text: $vm.title)
+      TextField("Enter title", text: $draft.title)
         .textFieldStyle(RoundedBorderTextFieldStyle())
         .padding()
       Spacer()
     }
-    .onReceive(vm.$closeView, perform: { value in
-      if value  {
-        presentation.wrappedValue.dismiss()
-      }
-    })
+    .onAppear(perform: viewSetup)
   }
   
-  var viewTitle: String {
-    vm.task == nil ? "New task" : "Edit task"
+  func viewSetup() {
+    guard let task = task else { return }
+    draft = task
+  }
+  
+  func cancel() { presentation.wrappedValue.dismiss() }
+  
+  func done() {
+    store.saveTask(draft)
+    presentation.wrappedValue.dismiss()
   }
 }
 
 struct TaskEditView_Previews: PreviewProvider {
-  static let vm = TaskEditViewModel(dbService: PreviewDatabaseService())
+  static let store = TaskStore.preview
   
   static var previews: some View {
-    TaskEditView(vm: vm)
+    TaskEditView(task: Task.preview)
   }
 }

@@ -8,33 +8,35 @@ import SwiftUI
 
 struct TaskDetailView: View {
   
-  @ObservedObject var vm: TaskDetailViewModel
+  let task: Task
+  
+  @State private var showingTaskEdit = false
   
   var body: some View {
     VStack {
-      Text(vm.task.title)
+      Text(task.title)
         .font(.title)
-      Text("Id: \(vm.task.id)")
+      Text("Id: \(task.id)")
         .font(.footnote)
     }
-    .navigationBarTitle(vm.task.title)
+    .navigationBarTitle(task.title)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
-        Button(action: vm.showTaskEdit) {
+        Button(action: { showingTaskEdit = true }) {
           Image(systemName: "pencil")
         }
       }
     }
-    .sheet(isPresented: $vm.showingTaskEdit, onDismiss: vm.refreshData) {
-      TaskEditView(vm: vm.taskEditVM())
+    .sheet(isPresented: $showingTaskEdit) {
+      TaskEditView(task: task)
     }
   }
 }
 
 struct TaskDetailView_Previews: PreviewProvider {
-  static let vm = TaskDetailViewModel(dbService: PreviewDatabaseService(), task: Task.preview)
+  static let store = TaskStore.preview
   
   static var previews: some View {
-    TaskDetailView(vm: vm)
+    TaskDetailView(task: store.tasks[0])
   }
 }

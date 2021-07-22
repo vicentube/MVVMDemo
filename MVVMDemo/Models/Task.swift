@@ -25,8 +25,5 @@ struct Task: Identifiable, TaskProtocol {
   init(title: String) {
     self.title = title
   }
-  
-  static var preview: Task {
-    Task(title: "Preview task")
-  }
+
 }
