@@ -34,9 +34,7 @@ struct TaskDetailView: View {
 }
 
 struct TaskDetailView_Previews: PreviewProvider {
-  static let store = TaskStore.preview
-  
   static var previews: some View {
-    TaskDetailView(task: store.tasks[0])
+    TaskDetailView(task: Task.preview)
   }
 }

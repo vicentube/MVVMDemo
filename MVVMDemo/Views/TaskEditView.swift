@@ -60,5 +60,6 @@ struct TaskEditView_Previews: PreviewProvider {
   
   static var previews: some View {
     TaskEditView(task: Task.preview)
+      .environmentObject(store)
   }
 }

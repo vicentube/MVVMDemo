@@ -43,6 +43,7 @@ struct TaskListView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
       TaskListView()
+        .environmentObject(store)
     }
   }
 }
