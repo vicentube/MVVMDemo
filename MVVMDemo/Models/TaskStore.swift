@@ -22,18 +22,33 @@ final class TaskStore: ObservableObject {
     }
   }
   
-  func saveTask(_ task: Task) {
-    storage.saveTask(task) { [weak self] done in
+  func moveTasks(from indices: IndexSet, to index: Int) {
+    tasks.move(fromOffsets: indices, toOffset: index)
+  }
+  
+  func deleteTasks(indices: IndexSet) {
+    let tasksToDelete = indices.map { tasks[$0] }
+    let ids = tasksToDelete.map { $0.id }
+    storage.deleteTasks(tasksToDelete) { [weak self] done in
       guard done else { return }
-      if let index = self?.tasks.indexOf(task) {
-        self?.tasks[index] = task
+      self?.tasks.removeAll {
+        ids.contains($0.id)
       }
     }
   }
-}
-
-extension Array {
-  func indexOf(_ item: Element) -> Int? where Element: Identifiable {
-    self.firstIndex(where: { $0.id == item.id })
+  
+  func addTask(_ task: Task) {
+    storage.saveTask(task) { [weak self] done in
+      guard done else { return }
+      self?.tasks.append(task)
+    }
+  }
+  
+  func updateTask(_ task: Task) {
+    storage.saveTask(task) { [weak self] done in
+      guard done else { return }
+      guard let index = self?.tasks.indexOf(task) else { return }
+      self?.tasks[index] = task
+    }
   }
 }

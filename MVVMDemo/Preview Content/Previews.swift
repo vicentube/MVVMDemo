@@ -13,9 +13,3 @@ extension TaskStore {
     return store
   }
 }
-
-extension Task {
-  static var preview: Task {
-    Task(title: "Preview task")
-  }
-}

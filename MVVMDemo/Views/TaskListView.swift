@@ -1,39 +1,48 @@
 // TaskListView.swift
 // MVVMDemo
 //
-// Creado el 21/7/21 por Vicente Úbeda (@vicentube)
+// Creado el 28/7/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 import SwiftUI
 
-struct TaskListView: View {
+struct TaskListView<Detail: View>: View {
   
-  @EnvironmentObject private var store: TaskStore
-  
-  @State private var showingNewTask = false
-  
-  var tasks: [Task] { store.tasks }
+  @Binding var tasks: [Task]
+  let onMove: (IndexSet, Int) -> Void
+  let onDelete: (IndexSet) -> Void
+  let onNewTask: () -> Void
+  let onNavToDetail: (Binding<Task>) -> Detail
   
   var body: some View {
     List {
       ForEach(tasks) { task in
-        NavigationLink(destination: TaskDetailView(task: task)) {
-          Text(task.title)
+        bindTask(task).map { boundTask in
+          NavigationLink(destination: onNavToDetail(boundTask)) {
+            Text(task.title)
+          }
         }
       }
+      .onMove(perform: onMove)
+      .onDelete(perform: onDelete)
     }
     .navigationBarTitle("Tasks")
     .toolbar {
+      ToolbarItem(placement: .navigationBarLeading) {
+        EditButton()
+      }
       ToolbarItem(placement: .navigationBarTrailing) {
-        Button(action: { showingNewTask = true }) {
+        Button(action: onNewTask) {
           Image(systemName: "plus")
         }
       }
     }
-    .sheet(isPresented: $showingNewTask) {
-      TaskEditView(task: nil)
-    }
-    .onAppear(perform: store.getAllTasks)
+  }
+  
+  private func bindTask(_ task: Task) -> Binding<Task>? {
+    guard let index = tasks.indexOf(task) else { return nil }
+    return .init(get: { tasks[index] },
+                 set: { tasks[index] = $0 })
   }
 }
 
@@ -42,8 +51,11 @@ struct TaskListView_Previews: PreviewProvider {
   
   static var previews: some View {
     NavigationView {
-      TaskListView()
-        .environmentObject(store)
+      TaskListView(tasks: .constant(store.tasks),
+                   onMove: { _, _ in },
+                   onDelete: { _ in },
+                   onNewTask: {},
+                   onNavToDetail: { _ in EmptyView() })
     }
   }
 }

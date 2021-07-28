@@ -12,18 +12,16 @@ protocol TaskProtocol {
 }
 
 struct Task: Identifiable, TaskProtocol {
-  var id = UUID()
+  let id: UUID
   var title = ""
   
-  init() { }
+  init() {
+    self.id = UUID()
+  }
   
   init(_ task: TaskProtocol) {
     id = task.id
     title = task.title
   }
   
-  init(title: String) {
-    self.title = title
-  }
-
 }

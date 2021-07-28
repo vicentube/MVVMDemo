@@ -1,40 +1,35 @@
 // TaskDetailView.swift
 // MVVMDemo
 //
-// Creado el 21/7/21 por Vicente Úbeda (@vicentube)
+// Creado el 28/7/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 import SwiftUI
 
 struct TaskDetailView: View {
-  
-  let task: Task
-  
-  @State private var showingTaskEdit = false
+  let title: String
+  let onEdit: () -> Void
   
   var body: some View {
     VStack {
-      Text(task.title)
+      Text(title)
         .font(.title)
-      Text("Id: \(task.id)")
-        .font(.footnote)
     }
-    .navigationBarTitle(task.title)
+    .navigationBarTitle(title)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
-        Button(action: { showingTaskEdit = true }) {
+        Button(action: onEdit) {
           Image(systemName: "pencil")
         }
       }
-    }
-    .sheet(isPresented: $showingTaskEdit) {
-      TaskEditView(task: task)
     }
   }
 }
 
 struct TaskDetailView_Previews: PreviewProvider {
   static var previews: some View {
-    TaskDetailView(task: Task.preview)
+    NavigationView {
+      TaskDetailView(title: "Preview task", onEdit: {})
+    }
   }
 }

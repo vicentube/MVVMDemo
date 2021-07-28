@@ -14,9 +14,9 @@ struct MVVMDemoApp: App {
   var body: some Scene {
     WindowGroup {
       NavigationView {
-        TaskListView()
-          .environmentObject(store)
+        TaskListViewModel()
       }
+      .environmentObject(store)
     }
   }
 }

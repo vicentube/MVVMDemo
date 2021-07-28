@@ -1,65 +1,48 @@
 // TaskEditView.swift
 // MVVMDemo
 //
-// Creado el 21/7/21 por Vicente Úbeda (@vicentube)
+// Creado el 28/7/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 import SwiftUI
 
 struct TaskEditView: View {
   
-  let task: Task?
-  
-  @Environment(\.presentationMode) var presentation
-  @EnvironmentObject private var store: TaskStore
-  
-  @State private var draft = Task()
-  
-  var viewTitle: String {
-    task == nil ? "New task" : "Edit task"
-  }
+  @Binding var task: Task
+  let title: String
+  let onCancel: () -> Void
+  let onDone: () -> Void
   
   var body: some View {
     VStack {
-      HStack {
-        Button(action: cancel) {
-          Text("Cancel")
-        }
-        Spacer()
-        Button(action: done) {
-          Text("Done")
-        }
-      }
-      .padding()
-      Text(viewTitle)
-        .font(.title)
-        .padding()
-      TextField("Enter title", text: $draft.title)
+      TextField("Enter task title", text: $task.title)
         .textFieldStyle(RoundedBorderTextFieldStyle())
         .padding()
       Spacer()
     }
-    .onAppear(perform: viewSetup)
+    .navigationBarTitle(title)
+    .toolbar {
+      ToolbarItem(placement: .navigationBarLeading) {
+        Button(action: onCancel) {
+          Text("Cancel")
+        }
+      }
+      ToolbarItem(placement: .navigationBarTrailing) {
+        Button(action: onDone) {
+          Text("Done")
+        }
+      }
+    }
   }
   
-  func viewSetup() {
-    guard let task = task else { return }
-    draft = task
-  }
-  
-  func cancel() { presentation.wrappedValue.dismiss() }
-  
-  func done() {
-    store.saveTask(draft)
-    presentation.wrappedValue.dismiss()
-  }
 }
 
 struct TaskEditView_Previews: PreviewProvider {
   static let store = TaskStore.preview
   
   static var previews: some View {
-    TaskEditView(task: Task.preview)
-      .environmentObject(store)
+    NavigationView {
+      TaskEditView(task: .constant(store.tasks[0]), title: "Edit preview", onCancel: {}, onDone: {})
+    }
   }
 }

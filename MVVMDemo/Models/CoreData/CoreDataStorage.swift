@@ -9,8 +9,7 @@ import CoreData
 protocol StorageProtocol {
   
   func fetchAllTasks(completion: @escaping ([TaskProtocol]) -> Void)
-  func fetchTaskById(_ id: UUID, completion: @escaping (TaskProtocol) -> Void)
-  func deleteTasks(_ ids: [UUID], completion: @escaping (Bool) -> Void)
+  func deleteTasks(_ tasks: [TaskProtocol], completion: @escaping (Bool) -> Void)
   func saveTask(_ task: TaskProtocol, completion: @escaping (Bool) -> Void)
 }
 
@@ -50,29 +49,12 @@ final class CoreDataStorage: StorageProtocol {
     }
   }
   
-  func fetchTaskById(_ id: UUID, completion: @escaping (TaskProtocol) -> Void) {
-    // background work
-    moc.perform {
-      do {
-        let request: NSFetchRequest = TaskMO.fetchRequest()
-        request.predicate = NSPredicate(format: "idM == %@", id as CVarArg)
-        let tasks = try self.moc.fetch(request)
-        if let mo = tasks.first {
-          DispatchQueue.main.async {
-            completion(mo)
-          }
-        }
-      } catch {
-        print(error.localizedDescription)
-      }
-    }
-  }
-  
-  func deleteTasks(_ ids: [UUID], completion: @escaping (Bool) -> Void) {
+  func deleteTasks(_ tasks: [TaskProtocol], completion: @escaping (Bool) -> Void) {
     // background work
     moc.perform {
       do {
         // fetch projects to delete
+        let ids = tasks.map { $0.id }
         let tasks = try self.fetchTasksMO(ids)
         // mark them to be deleted
         let _ = tasks.map(self.moc.delete)
@@ -98,12 +80,10 @@ final class CoreDataStorage: StorageProtocol {
         let tasks = try self.fetchTasksMO([task.id])
         if let mo = tasks.first {
           // if exists, then update
-          mo.titleM = task.title
+          mo.update(with: task)
         } else {
           // if it doesn't, then create
-          let newMO = TaskMO(context: self.moc)
-          newMO.idM = task.id
-          newMO.titleM = task.title
+          TaskMO.fromTask(task, context: self.moc)
         }
         try self.save()
         DispatchQueue.main.async {
@@ -131,32 +111,5 @@ final class CoreDataStorage: StorageProtocol {
     if moc.hasChanges {
       try moc.save()
     }
-  }
-}
-
-final class PreviewStorage: StorageProtocol {
-  
-  func fetchAllTasks(completion: @escaping ([TaskProtocol]) -> Void) {
-    let tasks = [
-      Task(title: "Task 1"),
-      Task(title: "Task 2"),
-      Task(title: "Task 3"),
-      Task(title: "Task 4"),
-      Task(title: "Task 5"),
-      Task(title: "Task 6"),
-    ]
-    completion(tasks)
-  }
-  
-  func fetchTaskById(_ id: UUID, completion: @escaping (TaskProtocol) -> Void) {
-    
-  }
-  
-  func deleteTasks(_ ids: [UUID], completion: @escaping (Bool) -> Void) {
-    
-  }
-  
-  func saveTask(_ task: TaskProtocol, completion: @escaping (Bool) -> Void) {
-    
   }
 }
