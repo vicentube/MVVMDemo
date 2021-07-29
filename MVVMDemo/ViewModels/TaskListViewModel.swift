@@ -38,19 +38,10 @@ struct TaskListViewModel: View {
     }
   }
   
-  private func navToDetail(_ task: Task) -> some View {
-    bindTask(task).map { boundTask in
-      NavigationLink(destination: TaskDetailViewModel(task: boundTask)) {
-        Text(task.title)
-      }
-    }
+  private func navToDetail(_ task: Binding<Task>) -> some View {
+    TaskDetailViewModel(task: task)
   }
   
-  private func bindTask(_ task: Task) -> Binding<Task>? {
-    guard let index = store.tasks.indexOf(task) else { return nil }
-    return .init(get: { store.tasks[index] },
-                 set: { store.tasks[index] = $0 })
-  }
 }
 
 struct TaskListViewModel_Previews: PreviewProvider {

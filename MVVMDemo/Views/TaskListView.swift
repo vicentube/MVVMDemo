@@ -6,18 +6,22 @@
 
 import SwiftUI
 
-struct TaskListView<Detail: View>: View {
+struct TaskListView<NavDestination: View>: View {
   
   @Binding var tasks: [Task]
   let onMove: (IndexSet, Int) -> Void
   let onDelete: (IndexSet) -> Void
   let onNewTask: () -> Void
-  let navToDetail: (Task) -> Detail
+  let navToDetail: (Binding<Task>) -> NavDestination
   
   var body: some View {
     List {
       ForEach(tasks) { task in
-        navToDetail(task)
+        bindTask(task).map { boundTask in
+          NavigationLink(destination: navToDetail(boundTask)) {
+            Text(task.title)
+          }
+        }
       }
       .onMove(perform: onMove)
       .onDelete(perform: onDelete)
@@ -35,6 +39,11 @@ struct TaskListView<Detail: View>: View {
     }
   }
   
+  private func bindTask(_ task: Task) -> Binding<Task>? {
+    guard let index = tasks.indexOf(task) else { return nil }
+    return .init(get: { tasks[index] },
+                 set: { tasks[index] = $0 })
+  }
 }
 
 struct TaskListView_Previews: PreviewProvider {
