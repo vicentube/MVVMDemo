@@ -8,15 +8,17 @@ import SwiftUI
 
 struct TaskEditViewModel: View {
   
-  @Environment(\.presentationMode) var presentation
-  @EnvironmentObject private var store: TaskStore
-  
   let task: Task?
   
+  @Environment(\.presentationMode) var presentation
+  @EnvironmentObject private var store: TaskStore
   @State private var draft = Task()
   
   var body: some View {
-    TaskEditView(task: $draft, title: viewTitle, onCancel: dismiss, onDone: saveTask)
+    TaskEditView(task: $draft,
+                 title: viewTitle,
+                 onCancel: dismiss,
+                 onDone: saveTask)
       .onAppear(perform: viewSetup)
   }
   

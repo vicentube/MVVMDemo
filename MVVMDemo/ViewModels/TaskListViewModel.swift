@@ -9,7 +9,6 @@ import SwiftUI
 struct TaskListViewModel: View {
   
   @EnvironmentObject private var store: TaskStore
-  
   @State private var showingNewTask = false
   
   var body: some View {
