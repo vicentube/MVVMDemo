@@ -18,7 +18,7 @@ struct TaskListViewModel: View {
                  onDelete: deleteTasks,
                  onNewTask: showNewTask,
                  navToDetail: navToDetail)
-      .sheet(isPresented: $showingNewTask, content: newTaskView)
+      .sheet(isPresented: $showingNewTask, content: newTaskViewModel)
       .onAppear(perform: store.getAllTasks)
   }
   
@@ -32,7 +32,7 @@ struct TaskListViewModel: View {
   
   private func showNewTask() { showingNewTask = true }
   
-  private func newTaskView() -> some View {
+  private func newTaskViewModel() -> some View {
     NavigationView {
       TaskEditViewModel(task: nil)      
     }

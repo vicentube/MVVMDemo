@@ -13,13 +13,13 @@ struct TaskDetailViewModel: View {
   @State private var showingTaskEdit = false
   
   var body: some View {
-    TaskDetailView(title: task.title, onEdit: editTask)
-      .sheet(isPresented: $showingTaskEdit, content: showEditTask)
+    TaskDetailView(title: task.title, onEdit: showTaskEdit)
+      .sheet(isPresented: $showingTaskEdit, content: taskEditViewModel)
   }
   
-  private func editTask() { showingTaskEdit = true }
+  private func showTaskEdit() { showingTaskEdit = true }
   
-  private func showEditTask() -> some View {
+  private func taskEditViewModel() -> some View {
     NavigationView {
       TaskEditViewModel(task: task)
     }
