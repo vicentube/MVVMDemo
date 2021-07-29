@@ -16,9 +16,9 @@ struct TaskListViewModel: View {
     TaskListView(tasks: $store.tasks,
                  onMove: moveTasks,
                  onDelete: deleteTasks,
-                 onNewTask: newTask,
-                 onNavToDetail: navToDetailTask)
-      .sheet(isPresented: $showingNewTask, content: showNewTask)
+                 onNewTask: showNewTask,
+                 navToDetail: navToDetail)
+      .sheet(isPresented: $showingNewTask, content: newTaskView)
       .onAppear(perform: store.getAllTasks)
   }
   
@@ -30,16 +30,26 @@ struct TaskListViewModel: View {
     store.deleteTasks(indices: indices)
   }
   
-  private func newTask() { showingNewTask = true }
+  private func showNewTask() { showingNewTask = true }
   
-  private func showNewTask() -> some View {
+  private func newTaskView() -> some View {
     NavigationView {
       TaskEditViewModel(task: nil)      
     }
   }
   
-  private func navToDetailTask(_ task: Binding<Task>) -> some View {
-    TaskDetailViewModel(task: task)
+  private func navToDetail(_ task: Task) -> some View {
+    bindTask(task).map { boundTask in
+      NavigationLink(destination: TaskDetailViewModel(task: boundTask)) {
+        Text(task.title)
+      }
+    }
+  }
+  
+  private func bindTask(_ task: Task) -> Binding<Task>? {
+    guard let index = store.tasks.indexOf(task) else { return nil }
+    return .init(get: { store.tasks[index] },
+                 set: { store.tasks[index] = $0 })
   }
 }
 

@@ -12,16 +12,12 @@ struct TaskListView<Detail: View>: View {
   let onMove: (IndexSet, Int) -> Void
   let onDelete: (IndexSet) -> Void
   let onNewTask: () -> Void
-  let onNavToDetail: (Binding<Task>) -> Detail
+  let navToDetail: (Task) -> Detail
   
   var body: some View {
     List {
       ForEach(tasks) { task in
-        bindTask(task).map { boundTask in
-          NavigationLink(destination: onNavToDetail(boundTask)) {
-            Text(task.title)
-          }
-        }
+        navToDetail(task)
       }
       .onMove(perform: onMove)
       .onDelete(perform: onDelete)
@@ -39,11 +35,6 @@ struct TaskListView<Detail: View>: View {
     }
   }
   
-  private func bindTask(_ task: Task) -> Binding<Task>? {
-    guard let index = tasks.indexOf(task) else { return nil }
-    return .init(get: { tasks[index] },
-                 set: { tasks[index] = $0 })
-  }
 }
 
 struct TaskListView_Previews: PreviewProvider {
@@ -55,7 +46,7 @@ struct TaskListView_Previews: PreviewProvider {
                    onMove: { _, _ in },
                    onDelete: { _ in },
                    onNewTask: {},
-                   onNavToDetail: { _ in EmptyView() })
+                   navToDetail: { _ in EmptyView() })
     }
   }
 }
