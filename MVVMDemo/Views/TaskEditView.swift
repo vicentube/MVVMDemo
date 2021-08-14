@@ -6,30 +6,27 @@
 
 import SwiftUI
 
-struct TaskEditView: View {
-  
-  @Binding var task: Task
-  let title: String
-  let onCancel: () -> Void
-  let onDone: () -> Void
+extension TaskEditView: View {
   
   var body: some View {
-    VStack {
-      TextField("Enter task title", text: $task.title)
-        .textFieldStyle(RoundedBorderTextFieldStyle())
-        .padding()
-      Spacer()
-    }
-    .navigationBarTitle(title)
-    .toolbar {
-      ToolbarItem(placement: .navigationBarLeading) {
-        Button(action: onCancel) {
-          Text("Cancel")
-        }
+    NavigationView {
+      VStack {
+        TextField("Enter task title", text: $draft.title)
+          .textFieldStyle(RoundedBorderTextFieldStyle())
+          .padding()
+        Spacer()
       }
-      ToolbarItem(placement: .navigationBarTrailing) {
-        Button(action: onDone) {
-          Text("Done")
+      .navigationBarTitle(title)
+      .toolbar {
+        ToolbarItem(placement: .navigationBarLeading) {
+          Button(action: dismiss) {
+            Text("Cancel")
+          }
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
+          Button(action: saveTaskAndClose) {
+            Text("Done")
+          }
         }
       }
     }
@@ -38,11 +35,10 @@ struct TaskEditView: View {
 }
 
 struct TaskEditView_Previews: PreviewProvider {
-  static let store = TaskStore.preview
+  static let model = TaskStore.preview
   
   static var previews: some View {
-    NavigationView {
-      TaskEditView(task: .constant(store.tasks[0]), title: "Edit preview", onCancel: {}, onDone: {})
-    }
+    TaskEditView(task: model.tasks[0])
+      .environmentObject(model)
   }
 }

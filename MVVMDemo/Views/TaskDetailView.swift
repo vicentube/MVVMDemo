@@ -6,31 +6,31 @@
 
 import SwiftUI
 
-struct TaskDetailView: View {
-  
-  let title: String
-  let onEdit: () -> Void
+extension TaskDetailView: View {
   
   var body: some View {
     VStack {
-      Text(title)
+      Text(task.title)
         .font(.title)
     }
-    .navigationBarTitle(title)
+    .navigationBarTitle(task.title)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
-        Button(action: onEdit) {
+        Button(action: showTaskEdit) {
           Image(systemName: "pencil")
         }
       }
+    }
+    .sheet(isPresented: $showingTaskEdit) {
+      TaskEditView(task: task)
     }
   }
 }
 
 struct TaskDetailView_Previews: PreviewProvider {
+  static let model = TaskStore.preview
+  
   static var previews: some View {
-    NavigationView {
-      TaskDetailView(title: "Preview task", onEdit: {})
-    }
+    TaskDetailView(task: model.tasks[0])
   }
 }

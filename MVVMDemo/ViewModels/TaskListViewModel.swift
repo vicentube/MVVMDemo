@@ -4,52 +4,30 @@
 // Creado el 21/7/21 por Vicente Úbeda (@vicentube)
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
+import Foundation
+import Combine
 import SwiftUI
 
-struct TaskListViewModel: View {
+struct TaskListView {
   
-  @EnvironmentObject private var store: TaskStore
-  @State private var showingNewTask = false
+  @EnvironmentObject private var model: TaskStore
+  @State var showingNewTask = false
   
-  var body: some View {
-    TaskListView(tasks: $store.tasks,
-                 onMove: moveTasks,
-                 onDelete: deleteTasks,
-                 onNewTask: showNewTask,
-                 navToDetail: navToDetail)
-      .sheet(isPresented: $showingNewTask, content: newTaskViewModel)
-      .onAppear(perform: store.getAllTasks)
+  var tasks: [Task] { model.tasks }
+  
+  func showNewTask() { showingNewTask = true }
+  
+  func loadAllTasks() {
+    model.getAllTasks()
   }
   
-  private func moveTasks(from offsets: IndexSet, to index: Int) {
-    store.moveTasks(from: offsets, to: index)
+  func moveTasks(from indices: IndexSet, to index: Int) {
+    model.tasks.move(fromOffsets: indices, toOffset: index)
   }
   
-  private func deleteTasks(indices: IndexSet) {
-    store.deleteTasks(indices: indices)
+  func deleteTasks(indices: IndexSet) {
+    let tasksToDelete = indices.map { tasks[$0] }
+    model.deleteTasks(tasksToDelete)
   }
-  
-  private func showNewTask() { showingNewTask = true }
-  
-  private func newTaskViewModel() -> some View {
-    NavigationView {
-      TaskEditViewModel(task: nil)      
-    }
-  }
-  
-  private func navToDetail(_ task: Binding<Task>) -> some View {
-    TaskDetailViewModel(task: task)
-  }
-  
-}
 
-struct TaskListViewModel_Previews: PreviewProvider {
-  static let store = TaskStore.preview
-  
-  static var previews: some View {
-    NavigationView {
-      TaskListViewModel()
-    }
-    .environmentObject(store)
-  }
 }

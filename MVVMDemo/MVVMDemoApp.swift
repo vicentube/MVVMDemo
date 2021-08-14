@@ -9,14 +9,13 @@ import SwiftUI
 @main
 struct MVVMDemoApp: App {
   
-  @StateObject private var store = TaskStore()
+  @StateObject private var model = TaskStore(storage: CoreDataStorage())
   
   var body: some Scene {
     WindowGroup {
-      NavigationView {
-        TaskListViewModel()
-      }
-      .environmentObject(store)
+      TaskListView()
+        .environmentObject(model)
     }
   }
+
 }

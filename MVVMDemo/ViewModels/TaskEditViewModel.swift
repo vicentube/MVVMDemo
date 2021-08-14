@@ -5,24 +5,17 @@
 // Copyright © 2021 Vicente Úbeda. Todos los derechos reservados.
 
 import SwiftUI
+import Combine
 
-struct TaskEditViewModel: View {
+struct TaskEditView {
   
   let task: Task?
   
   @Environment(\.presentationMode) var presentation
-  @EnvironmentObject private var store: TaskStore
-  @State private var draft = Task()
+  @EnvironmentObject private var model: TaskStore
+  @State var draft = Task()
   
-  var body: some View {
-    TaskEditView(task: $draft,
-                 title: viewTitle,
-                 onCancel: dismiss,
-                 onDone: saveTask)
-      .onAppear(perform: viewSetup)
-  }
-  
-  var viewTitle: String {
+  var title: String {
     task == nil ? "New task" : "Edit task"
   }
   
@@ -33,23 +26,13 @@ struct TaskEditViewModel: View {
   
   func dismiss() { presentation.wrappedValue.dismiss() }
   
-  func saveTask() {
+  func saveTaskAndClose() {
     if task == nil {
-      store.addTask(draft)
+      model.addTask(draft)
     } else {
-      store.updateTask(draft)
+      model.updateTask(draft)
     }
     dismiss()
   }
-}
 
-struct TaskEditViewModel_Previews: PreviewProvider {
-  static let store = TaskStore.preview
-  
-  static var previews: some View {
-    NavigationView {
-      TaskEditViewModel(task: nil)
-    }
-    .environmentObject(store)
-  }
 }

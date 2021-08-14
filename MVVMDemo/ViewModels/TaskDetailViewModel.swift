@@ -6,33 +6,12 @@
 
 import SwiftUI
 
-struct TaskDetailViewModel: View {
+struct TaskDetailView {
   
-  @Binding var task: Task
-
-  @State private var showingTaskEdit = false
+  let task: Task
   
-  var body: some View {
-    TaskDetailView(title: task.title, onEdit: showTaskEdit)
-      .sheet(isPresented: $showingTaskEdit, content: taskEditViewModel)
-  }
+  @State var showingTaskEdit = false
   
-  private func showTaskEdit() { showingTaskEdit = true }
+  func showTaskEdit() { showingTaskEdit = true }
   
-  private func taskEditViewModel() -> some View {
-    NavigationView {
-      TaskEditViewModel(task: task)
-    }
-  }
-}
-
-struct TaskDetailViewModel_Previews: PreviewProvider {
-  static let store = TaskStore.preview
-  
-  static var previews: some View {
-    NavigationView {
-      TaskDetailViewModel(task: .constant(store.tasks[0]))
-    }
-    .environmentObject(store)
-  }
 }
